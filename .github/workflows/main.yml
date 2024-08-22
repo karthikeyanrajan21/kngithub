@@ -1,4 +1,4 @@
-name: Deploy EC2 Instance
+name: S3 Upload Pipeline
 
 on:
   push:
@@ -6,31 +6,29 @@ on:
       - main
 
 jobs:
-  deploy:
+  upload_to_s3:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+    - name: Checkout Code
       uses: actions/checkout@v3
 
-    - name: Set up AWS CLI
-      uses: aws-actions/configure-aws-credentials@v2
+    - name: Setup AWS CLI
+      uses: aws-actions/configure-aws-credentials@v3
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
 
-    - name: Launch EC2 Instance
+    - name: Create S3 Bucket (if it doesn't exist)
       run: |
-        INSTANCE_ID=$(aws ec2 run-instances \
-          --image-id ami-0e86e20dae9224db8 \
-          --count 1 \
-          --instance-type t2.micro \
-          --key-name MyKeyPair \
-          --security-group-ids sg-0383004c6de0a0ee7 \
-          --query 'Instances[0].InstanceId' \
-          --output text)
-        echo "Instance ID: $INSTANCE_ID"
+        BUCKET_NAME="my-github-actions-bucket"
+        aws s3api head-bucket --bucket $BUCKET_NAME 2>/dev/null || aws s3api create-bucket --bucket $BUCKET_NAME --region ${{ secrets.AWS_REGION }} --create-bucket-configuration LocationConstraint=${{ secrets.AWS_REGION }}
+        echo "Bucket $BUCKET_NAME ensured."
 
-        # Optionally, add more commands here to interact with the instance
-
+    - name: Upload Object to S3
+      run: |
+        FILE_TO_UPLOAD="/home/ubuntu/newfolder/hello.txt"
+        BUCKET_NAME="my-github-actions-bucket"
+        aws s3 cp $FILE_TO_UPLOAD s3://$BUCKET_NAME/
+        echo "File $FILE_TO_UPLOAD uploaded to s3://$BUCKET_NAME/"
