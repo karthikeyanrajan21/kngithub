@@ -21,7 +21,7 @@ jobs:
 
       - name: Create S3 Bucket
         run: |
-          aws s3api create-bucket --bucket kn212bucket --region us-east-1
+          aws s3api create-bucket --bucket kn2122bucket --region us-east-1
 
       - name: Upload file to S3
         run: |
