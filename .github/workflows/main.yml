@@ -26,4 +26,4 @@ jobs:
       - name: Upload file to S3
         run: |
           echo "This is a test file" > testfile.txt
-          aws s3 cp testfile.txt s3://kn21bucket/testfile.txt
+          aws s3 cp testfile.txt s3://kn2122bucket/testfile.txt
