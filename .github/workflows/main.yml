@@ -21,7 +21,7 @@ jobs:
 
       - name: Create S3 Bucket
         run: |
-          aws s3api create-bucket --bucket kn21bucket --region us-east-1 --create-bucket-configuration LocationConstraint=us-east-1 || echo "Bucket might already exist"
+          aws s3api create-bucket --bucket kn212bucket --region us-east-1
 
       - name: Upload file to S3
         run: |
