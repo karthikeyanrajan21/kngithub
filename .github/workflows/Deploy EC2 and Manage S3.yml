@@ -34,9 +34,9 @@ jobs:
 
     - name: Create S3 Bucket
       run: |
-        aws s3api create-bucket --bucket kn2122bucket --region ${{ secrets.AWS_REGION }}
+        aws s3api create-bucket --bucket kn217bucket --region ${{ secrets.AWS_REGION }}
 
     - name: Upload file to S3
       run: |
         echo "This is a test file" > testfile.txt
-        aws s3 cp testfile.txt s3://kn2122bucket/testfile.txt
+        aws s3 cp testfile.txt s3://kn217bucket/testfile.txt
