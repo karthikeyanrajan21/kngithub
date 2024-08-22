@@ -1,34 +1,26 @@
-name: S3 Upload Pipeline
+name: Create S3 Bucket
 
 on:
   push:
     branches:
-      - main
+      - main  # Trigger this workflow when pushing to the 'main' branch
 
 jobs:
-  upload_to_s3:
+  create-s3-bucket:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout Code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v2
 
-    - name: Setup AWS CLI
-      uses: aws-actions/configure-aws-credentials@v3
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ secrets.AWS_REGION }}
+        aws-region: us-east-1  # Specify your AWS region here
 
-    - name: Create S3 Bucket (if it doesn't exist)
+    - name: Create S3 Bucket
       run: |
-        BUCKET_NAME="my-github-actions-bucket"
-        aws s3api head-bucket --bucket $BUCKET_NAME 2>/dev/null || aws s3api create-bucket --bucket $BUCKET_NAME --region ${{ secrets.AWS_REGION }} --create-bucket-configuration LocationConstraint=${{ secrets.AWS_REGION }}
-        echo "Bucket $BUCKET_NAME ensured."
-
-    - name: Upload Object to S3
-      run: |
-        FILE_TO_UPLOAD="/home/ubuntu/newfolder/hello.txt"
-        BUCKET_NAME="my-github-actions-bucket"
-        aws s3 cp $FILE_TO_UPLOAD s3://$BUCKET_NAME/
-        echo "File $FILE_TO_UPLOAD uploaded to s3://$BUCKET_NAME/"
+        aws s3api create-bucket --bucket ${{ secrets.S3_BUCKET_NAME }} --region us-east-1 \
+        --create-bucket-configuration LocationConstraint=us-east-1
